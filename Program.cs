@@ -3,24 +3,48 @@ using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Discord.WebSocket;
+using Discord.Commands;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+
 namespace discordbot
 {
     class Program
     {
-
-        static async Task Main(string[] args)
+        
+        private static DiscordSocketClient _Client;
+        static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+        public async Task MainAsync()
         {
-            string BotKey = await SupportLib.GetDiscordKey();
-            DiscordSocketClient _Client = new DiscordSocketClient();
-            _Client.Log += LogMessage;
-            await _Client.LoginAsync(Discord.TokenType.Bot, BotKey);
-            await _Client.StartAsync();
-            await Task.Delay(-1);
+            
+            using(var sevices =  ConfigureServices())
+            {
+                DiscordSocketClient _Client = sevices.GetService<DiscordSocketClient>();
+                _Client.Log += _Client_Log;
+                await _Client.LoginAsync(Discord.TokenType.Bot,await SupportLib.GetDiscordKey());
+                await _Client.StartAsync();
+                await sevices.GetRequiredService<BotCommands>().ExecuteAsync();
+                await Task.Delay(-1);
+                
+            }
         }
-      static async Task LogMessage(Discord.LogMessage mess) //Log messages 
-      {
-         Console.WriteLine(mess.ToString());
-      }
+
+        private Task _Client_Log(Discord.LogMessage arg)
+        {
+            Console.WriteLine(arg.ToString());
+            return Task.CompletedTask;
+        }
+
+        private ServiceProvider ConfigureServices()
+        {
+            return new ServiceCollection()
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<CommandService>()
+                .AddSingleton<BotCommands>()
+                .AddSingleton<HttpClient>()
+                //.AddSingleton<PictureService>()
+                .BuildServiceProvider();
+        }
 
     }
     public static class SupportLib //To Get Discord tokens
