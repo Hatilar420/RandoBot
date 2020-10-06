@@ -42,6 +42,7 @@ namespace discordbot
                 .AddSingleton<CommandService>()
                 .AddSingleton<BotCommands>()
                 .AddSingleton<HttpClient>()
+                .AddSingleton<HackerHelp>()
                 //.AddSingleton<PictureService>()
                 .BuildServiceProvider();
         }
