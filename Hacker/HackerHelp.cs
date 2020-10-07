@@ -12,12 +12,15 @@ namespace discordbot
         {
            _Client =  c;
         }
-       public async Task<Story> GetTop()
+       public async Task<List<Story>> GetTop(int n)
        {
            string JsonTopData =  await _Client.GetStringAsync(HackerUrl.TopUrl);
            List<string> tops = JsonConvert.DeserializeObject< List<string> >(JsonTopData);
-           Story temp = await GetTopStoryAsync(tops[0]);
-           Console.WriteLine(temp.by);
+           List<Story> temp = new List<Story>();
+           for(int i = 0 ; i < n ; i++)
+           {
+                temp.Add(await GetTopStoryAsync(tops[i]));
+           }
            return temp;
        }
 
