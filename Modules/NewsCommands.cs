@@ -16,7 +16,7 @@ namespace discordbot
         [Command("GetTopNews")]
         public async Task info(int N)
         {  
-            if(N <= 21)
+            if(N <= 21 && N > 0)
             {
             List<Story> a  = await _HackerService.GetTop(N);
             EmbedBuilder b = new EmbedBuilder();
@@ -37,7 +37,7 @@ namespace discordbot
             await ReplyAsync(embed:c);
             }
             else{
-                await ReplyAsync($"Chal apni maa chuda {N} baar ");
+                await ReplyAsync($"Nah");
             }
         }
     } 

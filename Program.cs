@@ -12,7 +12,7 @@ namespace discordbot
     class Program
     {
         
-        private static DiscordSocketClient _Client;
+        //private static DiscordSocketClient _Client;
         static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
         public async Task MainAsync()
         {
@@ -41,8 +41,9 @@ namespace discordbot
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<BotCommands>()
-                .AddSingleton<HttpClient>()
+                .AddTransient<HttpClient>()
                 .AddSingleton<HackerHelp>()
+                .AddSingleton<WeatherHelp>()
                 //.AddSingleton<PictureService>()
                 .BuildServiceProvider();
         }
@@ -52,14 +53,23 @@ namespace discordbot
         {
             public static async Task<string> GetDiscordKey()
             {
-                string Key ;
-              using(StreamReader stream = new StreamReader(@"Keys.json"))
+                var s  = await GetSupport();
+                return s.DiscordKey;
+            }
+            public static async Task<string> GetWeatherKey()
+            {
+               var s  = await GetSupport();
+                return s.OpenWeatherKey;
+            }
+            private static async Task<Support> GetSupport()
+            {
+                Support support;
+                using(StreamReader stream = new StreamReader(@"Keys.json"))
                {
                 string s = await stream.ReadToEndAsync();
-                Support j = JsonConvert.DeserializeObject<Support>(s);
-                Key = j.DiscordKey;
+                support = JsonConvert.DeserializeObject<Support>(s);
                }
-               return Key;
+               return support;
             }
         }
 }
