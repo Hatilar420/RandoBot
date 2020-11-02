@@ -14,7 +14,7 @@ namespace discordbot
         {
             _WService = wh;
         }
-        [Command("Weather")]
+        [Command("weather")]
         public async Task WeatherInfo(params string[] cityname)
         {
            string city= "" ;
