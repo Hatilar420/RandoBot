@@ -45,6 +45,7 @@ namespace discordbot
                 .AddTransient<HttpClient>()
                 .AddSingleton<HackerHelp>()
                 .AddSingleton<WeatherHelp>()
+                .AddSingleton<MusicService>()
                 .AddLavaNode(x =>
                 {
                        x.SelfDeaf = false;
