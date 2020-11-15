@@ -4,6 +4,7 @@ using Discord.Commands;
 using System.Reflection;
 using System.Threading.Tasks;
 using Victoria;
+using Victoria.EventArgs;
 namespace discordbot
 {
    public class BotCommands
@@ -20,6 +21,7 @@ namespace discordbot
           _Client.MessageReceived += Cum;
           _Client.Ready +=Dis;
           lavaNode = l;
+          lavaNode.OnTrackEnded += OnEnd;
        }
        public async Task ExecuteAsync()
        {
@@ -41,6 +43,29 @@ namespace discordbot
           var context = new SocketCommandContext(_Client,mess);
           await _Commands.ExecuteAsync(context,off,_Service);
       }
+
+      public async Task OnEnd(TrackEndedEventArgs args)
+    {
+        if (!args.Reason.ShouldPlayNext()) {
+        return;
+    }
+
+    var player = args.Player;
+    if (!player.Queue.TryDequeue(out var queueable)) {
+        await player.TextChannel.SendMessageAsync("Queue completed!");
+        return;
+    }
+
+    if (!(queueable is LavaTrack track)) {
+        await player.TextChannel.SendMessageAsync("Next item in queue is not a track.");
+        return;
+    }
+
+    await args.Player.PlayAsync(track);
+    await args.Player.TextChannel.SendMessageAsync(
+        $"{args.Reason}: {args.Track.Title}\nNow playing: {track.Title}");
+
+    }
 
    }
 }
