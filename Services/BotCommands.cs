@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using System.Reflection;
 using System.Threading.Tasks;
+using Victoria;
 namespace discordbot
 {
    public class BotCommands
@@ -10,16 +11,26 @@ namespace discordbot
        private IServiceProvider _Service ;
        private DiscordSocketClient _Client;
        private CommandService _Commands;
-       public BotCommands(IServiceProvider _ser,DiscordSocketClient ds, CommandService cs)
+       private LavaNode lavaNode;
+       public BotCommands(IServiceProvider _ser,DiscordSocketClient ds, CommandService cs,LavaNode l)
        {
           _Service = _ser;
           _Client = ds;
           _Commands = cs;
           _Client.MessageReceived += Cum;
+          _Client.Ready +=Dis;
+          lavaNode = l;
        }
        public async Task ExecuteAsync()
        {
           await _Commands.AddModulesAsync(Assembly.GetEntryAssembly(),_Service); 
+       }
+       public async Task Dis()
+       {
+          if(!lavaNode.IsConnected)
+          {
+             await lavaNode.ConnectAsync();
+          }
        }
       public async Task Cum (SocketMessage message)
       {

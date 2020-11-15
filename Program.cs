@@ -6,6 +6,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
+using Victoria;
 
 namespace discordbot
 {
@@ -44,6 +45,10 @@ namespace discordbot
                 .AddTransient<HttpClient>()
                 .AddSingleton<HackerHelp>()
                 .AddSingleton<WeatherHelp>()
+                .AddLavaNode(x =>
+                {
+                       x.SelfDeaf = false;
+                })
                 //.AddSingleton<PictureService>()
                 .BuildServiceProvider();
         }
